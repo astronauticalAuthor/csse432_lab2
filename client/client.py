@@ -1,7 +1,8 @@
 from socket import *
+
 def iWant(clientSocket, command):
     clientSocket.send(command)
-    file = open('receive/'+command.split(' ')[1], 'wb')
+    file = open('received/'+command.split(' ')[1], 'wb')
     l = clientSocket.recv(1024)
     if l == 'Failure: What you talkin\' bout Willis? I ain\'t seen that file nowhere!':
         print(l)
@@ -30,17 +31,21 @@ def uTake(clientSocket, command):
 if __name__ == '__main__':
     serverName = 'localhost'
     serverPort = 12000
-    clientSocket = socket(AF_INET, SOCK_STREAM)
-    clientSocket.connect((serverName, serverPort))
-    command = raw_input('Input command:')
-    if 'iWant' in command:
-        #send to server
-        iWant(clientSocket,command)
-    elif 'uTake' in command:
-        uTake(clientSocket, command)
-    else:
-        #error
-        print('Failure: What you talkin\' bout Willis?')
-    modifiedcommand = clientSocket.recv(1024)
-    print('From Server:', modifiedcommand)
-    clientSocket.close()
+    while 1:
+        clientSocket = socket(AF_INET, SOCK_STREAM)
+        clientSocket.connect((serverName, serverPort))
+        command = raw_input('Input command:')
+        if 'iWant' in command:
+            #send to server
+            iWant(clientSocket,command)
+        elif 'uTake' in command:
+            uTake(clientSocket, command)
+        elif ';;;' in command:
+            clientSocket.close()
+            break
+        else:
+            #error
+            print('Failure: What you talkin\' bout Willis?')
+        modifiedcommand = clientSocket.recv(1024)
+        print('From Server:', modifiedcommand)
+        clientSocket.close()

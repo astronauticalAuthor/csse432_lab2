@@ -11,17 +11,14 @@ def uTake(connectionSocket, command):
     file.close()
     print('received file {0}'.format(filename))
 
-def iWant(connectionSocket, command):
-    print(command)
-    file = open('store/' + command, 'rb')
+def iWant(connectionSocket, filename):
+    file = open(filename, 'rb')
     l = file.read(1024)
     while l:
-        print(l)
         connectionSocket.send(l)
         l = file.read(1024)
     file.close
-    connectionSocket.send('EOF')
-    connectionSocket.shutdown(SHUT_WR)
+    print('sent file {0}'.format(filename))
 
 
 if __name__ == '__main__':
@@ -39,12 +36,12 @@ if __name__ == '__main__':
             uTake(connectionSocket, sentence.split(' ')[1])
         elif sentence.split(' ')[0] == 'iWant':
             #find file or say file not found
-            if not os.path.isfile(sentence.split(' ')[1]):
+            filename = 'store/' + sentence.split(' ')[1]
+            if not os.path.isfile(filename):
                 connectionSocket.send('Failure: What you talkin\' bout Willis? I ain\'t seen that file nowhere!')
             else:
-                iWant(connectionSocket, sentence.split(' ')[1])    
+                iWant(connectionSocket, filename)    
         else:
             #error
             print('error')
-        connectionSocket.send('Thank you for using dickbut')
         connectionSocket.close()
